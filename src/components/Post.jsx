@@ -17,6 +17,9 @@ export function Post({author, publishedAt, content}){
        
     ])
 
+    function handleInvalidTextArea(){
+        event.target.setCustomValidity('Esse campo é obrigatorio')
+    }
 
     function handleCreateNewComment (){
         event.preventDefault()
@@ -25,8 +28,17 @@ export function Post({author, publishedAt, content}){
         setNewCommentText('')
     }
 
+    function deleteComment(comment){
+        const commentWithOutDeleteOne = comments.filter(commentToDelete => {
+            return comment !== commentToDelete
+        })
+       
+        setComments(commentWithOutDeleteOne)
+    }
+
     function handleCommentChange(){
         setNewCommentText(event.target.value);
+        event.target.setCustomValidity('')
     }
     
 
@@ -34,6 +46,8 @@ export function Post({author, publishedAt, content}){
         locale: ptBr,
         addSuffix: true
     })
+
+    const isNewCommentEmpty = newCommentText.length === 0
     
     
     return(
@@ -65,16 +79,23 @@ export function Post({author, publishedAt, content}){
             <form onSubmit={handleCreateNewComment} className={styles.commentForm}>
                 <strong>Deixe seu comentario</strong>
                 
-                <textarea onChange={handleCommentChange} value={newCommentText} name='comment' placeholder="Deixe seu comentario"/>
+                <textarea 
+                    onChange={handleCommentChange} 
+                    value={newCommentText} 
+                    name='comment' 
+                    placeholder="Deixe seu comentario"
+                    onInvalid={handleInvalidTextArea}
+                    required
+                />
 
                 <footer>
-                    <button type="submit">Comentar</button>
+                    <button disabled={isNewCommentEmpty} type="submit">Publicar</button>
                 </footer>
             </form>
 
             <div className={styles.commentList}>
                 {comments.map(comment=>(
-                    <Comment key={comment} content={comment} />
+                    <Comment onDeleteComment={deleteComment} key={comment} content={comment} />
                 )
                 )}
             </div>
